@@ -1,8 +1,5 @@
-# ANGRY
+# Automatic Note GeneratoR for Youth
 544 NLP Project
-
-Automatic Note GeneratoR for Youth
-
 
 Major dependencies:
 
