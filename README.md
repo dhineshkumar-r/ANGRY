@@ -5,4 +5,6 @@ Automatic Note GeneratoR for Youth
 
 
 Major dependencies:
+
+
 SUMY -  https://github.com/miso-belica/sumy
