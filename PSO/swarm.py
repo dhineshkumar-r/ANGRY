@@ -1,3 +1,6 @@
+import Utils
+
+
 class Swarm:
 
     def __init__(self):
@@ -11,6 +14,9 @@ class Swarm:
         # Input:
         # Reference summaries
         # Model Generated summaries
+
+        # Utils.calculate_rouge()
+
         pass
 
     def update_particles(self):
@@ -25,4 +31,3 @@ class Swarm:
     def train(self):
         # Train for number of Iterations / Terminating condition is met.
         pass
-

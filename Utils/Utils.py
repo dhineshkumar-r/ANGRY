@@ -1,12 +1,5 @@
 # -*- coding: utf-8 -*-
 from typing import List
-import json
-
-
-def load_stop_words():
-    f = open("sample_data/hindi_stop_words.json", 'r', encoding="utf-8")
-    words = json.load(f)["stop_words"]
-    return frozenset(words)
 
 
 class Tokenizer:
