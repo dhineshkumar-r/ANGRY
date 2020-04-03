@@ -1,6 +1,7 @@
 from .Utils import Tokenizer
 from collections import defaultdict
 import json
+import numpy as np
 from typing import List
 
 
@@ -31,3 +32,12 @@ def create_ngrams(tokens, n):
     for ngram in (tuple(tokens[i:i + n]) for i in range(len(tokens) - n + 1)):
         ngrams[ngram] += 1
     return ngrams
+
+
+def sigmoid(x):
+    z = 1 / (1 + np.exp(-x))
+    return z
+
+
+def get_random_nos(n):
+    return np.random.rand(n)
