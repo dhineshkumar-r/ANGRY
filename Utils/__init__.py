@@ -21,7 +21,7 @@ def load_document(file_name):
 def process_document(document):
 
     for i, s in enumerate(document):
-        document[i] = list(map(Tokenizer.clean_word, s))
+        document[i] = list(map(Tokenizer.process_word, s))
 
     return document
 
