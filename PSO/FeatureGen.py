@@ -2,9 +2,10 @@ import numpy as np
 from collections import defaultdict
 
 class FeatureGen:
-    def __init__(self,chapter= "",n_grams = 2):
+    def __init__(self,chapter= "",n_grams = 2,summary_len = 75):
         # chapter = prep-processed text doc
         self.text = chapter
+        self.summary_length = summary_len
         self.n_grams = n_grams
         # let this be lists of lists, where each feature value is stored in a list with indices corresponding to sentence number
         self.feature_vector_list =[]
@@ -16,6 +17,9 @@ class FeatureGen:
 
     def set_n_grams(self,new_ngram):
         self.n_grams = new_ngram
+
+    def set_summary_length(self,new_sum_len):
+        self.summary_length = new_sum_len
 
     def create_ngrams(tokens, n):
         ngrams = defaultdict(int)
