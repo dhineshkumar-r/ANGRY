@@ -48,8 +48,9 @@ class FeatureGen:
                 sent_2grams = self.create_ngrams(tsentence, 2)
                 sent_3grams = self.create_ngrams(tsentence, 3)
                 sent_ngrams = set(sent_2grams + sent_3grams)
-                feature_val = sent_ngrams.intersection(title_ngrams)
+                feature_val = len(sent_ngrams.intersection(title_ngrams))/len(sent_ngrams.union(title_ngrams))
                 feature_val_list.append(feature_val)
+        return feature_val_list
 
 
     def getfeaturevec(self,doc = None,setngrams = None):
