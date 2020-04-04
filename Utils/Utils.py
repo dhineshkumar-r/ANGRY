@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
 from typing import List
-
+import re
 
 class Tokenizer:
 
     def __init__(self):
         pass
+
+    @staticmethod
+    def clean_word(w):
+        return w.strip().replace(":", "").replace("'", "").replace("\"", "").\
+                replace("(", "").replace(")", "").replace(",", "").replace("[", "").replace("]", "")
 
     @staticmethod
     def to_sentences(text: str) -> List[str]:

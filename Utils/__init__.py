@@ -3,6 +3,27 @@ from collections import defaultdict
 import json
 import numpy as np
 from typing import List
+from sumy.parsers.plaintext import PlaintextParser
+
+
+def load_document(file_name):
+    t = Utils.Tokenizer()
+    parser = PlaintextParser.from_file(file_name, t)
+    document = []
+    for s in parser.document.sentences:
+        words = s.words
+        if len(words) != 1:
+            document.append(words)
+
+    return document
+
+
+def process_document(document):
+
+    for i, s in enumerate(document):
+        document[i] = list(map(Tokenizer.clean_word, s))
+
+    return document
 
 
 def load_stop_words():

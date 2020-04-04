@@ -1,0 +1,12 @@
+Another keyphrase extraction algorithm is TextRank.
+While supervised methods have some nice properties, they also require a large amount of training data.
+Many documents with known keyphrases are needed.
+Furthermore,the resulting classifier is not necessarily portable.
+Unsupervised keyphrase extraction removes the need for training data.
+It approaches the problem from a different angle.
+Instead of trying to learn explicit features that characterize keyphrases,
+    the TextRank algorithm exploits the structure of the text itself.
+Recall this is based on the notion of "prestige" or "recommendation" from social networks.
+TextRank does not rely on any previous training data at all,
+    but rather can be run on any arbitrary piece of text.
+Thus the algorithm is easily portable to new domains and languages.
