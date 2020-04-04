@@ -23,7 +23,7 @@ class FeatureGen:
     def set_summary_length(self,new_sum_len):
         self.summary_length = new_sum_len
 
-    def create_ngrams(tokens, n):
+    def create_ngrams(self, tokens, n):
         ngrams = defaultdict(int)
         for ngram in (tuple(tokens[i:i + n]) for i in range(len(tokens) - n + 1)):
             ngrams[ngram] += 1
@@ -39,7 +39,7 @@ class FeatureGen:
         for sentence in self.text:
             tsentence = sentence.split(" ")
             first_word = tsentence[0]
-            if first_word == '@':
+            if first_word == '।@':
                 title_tokens = tsentence[2:]
                 title_2grams = self.create_ngrams(title_tokens, 2)
                 title_3grams = self.create_ngrams(title_tokens, 3)
@@ -54,7 +54,7 @@ class FeatureGen:
                 feature_val_list.append(feature_val)
         return feature_val_list
 
-    def term_frequency(sentence):
+    def term_frequency(self, sentence):
         """
         Args:
             sentence (List[str]): Sentence whose term frequency is to be determined
@@ -114,8 +114,8 @@ class FeatureGen:
         Returns:
             score (float): Similarity score between sentence1 and sentence2
         """
-        tf_sentence1_dict = term_frequency(sentence1)
-        tf_sentence2_dict = term_frequency(sentence2)
+        tf_sentence1_dict = self.term_frequency(sentence1)
+        tf_sentence2_dict = self.term_frequency(sentence2)
 
         words1 = set(sentence1)
         words2 = set(sentence2)
@@ -125,9 +125,9 @@ class FeatureGen:
         denominator2 = 0.0
         for word1 in words1:
             if word1 in words2:
-                numerator += tf_sentence1_dict[word1] * tf_sentence2_dict[word1] * inverse_sentence_frequency(word1)
-                denominator1 += tf_sentence1_dict[word1] * inverse_sentence_frequency(word1)
-                denominator2 += tf_sentence2_dict[word1] * inverse_sentence_frequency(word1)
+                numerator += tf_sentence1_dict[word1] * tf_sentence2_dict[word1] * self.inverse_sentence_frequency(word1)
+                denominator1 += tf_sentence1_dict[word1] * self.inverse_sentence_frequency(word1)
+                denominator2 += tf_sentence2_dict[word1] * self.inverse_sentence_frequency(word1)
 
         denominator = (denominator1 ** 0.5) * (denominator2 ** 0.5)
         if denominator == 0.0:
@@ -149,7 +149,7 @@ class FeatureGen:
         score = 0.0
         
         for individual_sentence in self.text:
-            if individual_sentence == sentence or individual_sentence[0] == '@':
+            if individual_sentence == sentence or individual_sentence[0] == '।@':
                 continue
             score += self.calculate_similarity_sentences(sentence, individual_sentence)
 
@@ -186,7 +186,7 @@ class FeatureGen:
         score = 0.0
         
         for individual_sentence in self.text:
-            if individual_sentence == sentence or individual_sentence[0] == '@':
+            if individual_sentence == sentence or individual_sentence[0] == '।@':
                 continue
             score += self.shared_grams_sentences(sentence, individual_sentence)
 
@@ -231,17 +231,16 @@ class FeatureGen:
             feature_val_list (List[float]): Sentence centrality feature values
         """
         feature_val_list = []
-        
         n = len(self.text)
         for sentence in self.text:
-            if sentence[0] == '@':
+            if sentence[0] == '।@':
                 continue
-            similarity_score = self.calculate_similarity(sentence, self.text)
-            shared_grams_score = self.calculate_shared_gram_score(sentence, self.text)
+            similarity_score = self.calculate_similarity(sentence)
+            shared_grams_score = self.calculate_shared_gram_score(sentence)
             #print(similarity_score, shared_grams_score)
             score = (similarity_score + shared_grams_score) / (n-1)
             feature_val_list.append(score)
-        
+            
         return feature_val_list
 
     def getfeaturevec(self,doc = None,setngrams = None):
@@ -253,16 +252,13 @@ class FeatureGen:
 
 
         # put your feature functions below
-        self.feature_vector_list.append(self.get_Topic_Sentence_Feature)
+        self.feature_vector_list.append(self.get_Topic_Sentence_Feature())
         # Create sentence frequencies
         self.sentence_frequency()
-        self.feature_vector_list.append(self.sentence_centrality)
+        self.feature_vector_list.append(self.sentence_centrality())
 
 
-
-
-        # Transpose this before returning
-        return np.array(self.feature_vector_list)
+        return np.array(self.feature_vector_list).T
 
 
 
