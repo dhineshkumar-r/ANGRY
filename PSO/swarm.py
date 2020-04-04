@@ -3,9 +3,20 @@ import numpy as np
 from PSO import Particle
 
 
+def join_sentences(doc):
+    return " ".join([" ".join(_) for _ in doc])
+
+
+def join_docs(docs):
+    return [join_sentences(d) for d in docs]
+
+
 class Swarm:
 
-    def __init__(self, n_features, n_particles, n_iterations, w, c1, c2, sum_size):
+    def __init__(self, document, ref_sum, n_features=3, n_particles=3, n_iterations=100, w=0.5, c1=1, c2=1,
+                 sum_size=75):
+        self.document = document
+        self.ref_sum = join_docs(ref_sum)
         self.n_features = n_features
         self.iter = n_iterations
         self.particles = [Particle(self.n_features) for _ in range(n_particles)]
@@ -19,15 +30,15 @@ class Swarm:
         self.ref_sum = None
 
     def fitness(self, p):
-        p_sum = np.argsort(np.dot(self.features, p.pos))[-self.sum_size:]
+        p_sum_idx = np.argsort(np.dot(self.features, p.pos))[-self.sum_size:]
+        p_sum = join_sentences([self.document[idx] for idx in p_sum_idx])
         return Utils.calculate_rouge(p_sum, self.ref_sum, 1)
 
     # TODO Dynamically updating inertia.
 
-    def train(self, features, ref_sum):
+    def train(self, features):
 
         self.features = features
-        self.ref_sum = ref_sum
 
         for _ in range(self.iter):
 
@@ -54,5 +65,3 @@ if __name__ == "__main__":
     s = Swarm(5, 10, 5, 0.5, 1, 1, 3)
     weights = s.train()
     print(weights)
-
-

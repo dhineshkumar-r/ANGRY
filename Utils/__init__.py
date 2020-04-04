@@ -4,9 +4,10 @@ import json
 import numpy as np
 from typing import List
 from sumy.parsers.plaintext import PlaintextParser
+import os
 
 
-def load_document(file_name):
+def load_documents(file_name, ref_dir):
     t = Utils.Tokenizer()
     parser = PlaintextParser.from_file(file_name, t)
     document = []
@@ -15,15 +16,37 @@ def load_document(file_name):
         if len(words) != 1:
             document.append(words)
 
-    return document
+    ref = []
+    for r_fn in os.listdir(ref_dir):
+        parser = PlaintextParser.from_file(ref_dir + "/" + r_fn, t)
+        document = []
+        for s in parser.document.sentences:
+            words = s.words
+            if len(words) != 1:
+                document.append(words)
+
+        ref.append(document)
+
+    return document, ref
 
 
 def process_document(document):
-
     for i, s in enumerate(document):
-        document[i] = list(map(Tokenizer.process_word, s))
-
+        document[i] = list(map(process_word, s))
     return document
+
+
+def process_documents(docs):
+    p_docs = []
+    for d in docs:
+        p_docs.append(process_document(d))
+    return p_docs
+
+
+def process_word(w):
+    word = Tokenizer.clean_word(w)
+    word = Tokenizer.stem_word(word)
+    return word
 
 
 def load_stop_words():
