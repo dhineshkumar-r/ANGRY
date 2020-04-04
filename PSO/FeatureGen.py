@@ -1,3 +1,4 @@
+import math
 import numpy as np
 from collections import defaultdict
 
@@ -9,7 +10,8 @@ class FeatureGen:
         self.n_grams = n_grams
         # let this be lists of lists, where each feature value is stored in a list with indices corresponding to sentence number
         self.feature_vector_list =[]
-
+        # For calculating word frequency in sentence
+        self.sentence_frequency_dict = dict()
 
 
     def setdoc(self, new_chapter):
@@ -52,6 +54,195 @@ class FeatureGen:
                 feature_val_list.append(feature_val)
         return feature_val_list
 
+    def term_frequency(sentence):
+        """
+        Args:
+            sentence (List[str]): Sentence whose term frequency is to be determined
+
+        Returns:
+            frequencies (dict): Returns term frequency for each term in sentence
+        """
+        frequencies = dict()
+
+        for term in sentence:
+            if term in frequencies:
+                frequencies[term] += 1
+            else:
+                frequencies[term] = 1
+
+        for key in frequencies.keys():
+            frequencies[key] = frequencies[key] / len(sentence) 
+
+        return frequencies
+
+
+    def sentence_frequency(self):
+        
+        self.sentence_frequency_dict["length"] = len(self.text)
+        
+        for sentence in self.text:
+            words = set(sentence)
+            for word in words:
+                if word in self.sentence_frequency_dict:
+                    self.sentence_frequency_dict[word] += 1
+                else:
+                    self.sentence_frequency_dict[word] = 1
+
+
+    def inverse_sentence_frequency(self, word):
+        """
+        Args:
+            word (str): Given word
+            
+        Returns:
+            score (float): ISF score
+        """
+        n = self.sentence_frequency_dict["length"]
+        numerator = math.log(self.sentence_frequency_dict[word] + 1)
+        denominator = math.log(n+1)
+
+        score = (1 - numerator / denominator) ** 2
+        return score
+
+
+    def calculate_similarity_sentences(self, sentence1, sentence2):
+        """
+        Args:
+            sentence1 (List[str]): Sentence one
+            sentence2 (List[str]): Sentence two
+            
+        Returns:
+            score (float): Similarity score between sentence1 and sentence2
+        """
+        tf_sentence1_dict = term_frequency(sentence1)
+        tf_sentence2_dict = term_frequency(sentence2)
+
+        words1 = set(sentence1)
+        words2 = set(sentence2)
+
+        numerator = 0.0
+        denominator1 = 0.0
+        denominator2 = 0.0
+        for word1 in words1:
+            if word1 in words2:
+                numerator += tf_sentence1_dict[word1] * tf_sentence2_dict[word1] * inverse_sentence_frequency(word1)
+                denominator1 += tf_sentence1_dict[word1] * inverse_sentence_frequency(word1)
+                denominator2 += tf_sentence2_dict[word1] * inverse_sentence_frequency(word1)
+
+        denominator = (denominator1 ** 0.5) * (denominator2 ** 0.5)
+        if denominator == 0.0:
+            return 0.0
+        
+        score = numerator / denominator
+        #TODO: Implement simmilarity threshold
+        return score
+
+
+    def calculate_similarity(self, sentence):
+        """
+        Args:
+            sentence (List[str]): Sentence whose centrality is to be calculated
+            
+        Returns:
+            score (float): Sum of similarity between sentence and all other sentences in document
+        """
+        score = 0.0
+        
+        for individual_sentence in self.text:
+            if individual_sentence == sentence or individual_sentence[0] == '@':
+                continue
+            score += self.calculate_similarity_sentences(sentence, individual_sentence)
+
+        return score
+
+
+    def shared_grams_sentences(self, sentence1, sentence2):
+        """
+        Args:
+            sentence1 (List[str]): Sentence one
+            sentence2 (List[str]): Sentence two
+            
+        Returns:
+            score (float): Shared gram score between sentence1 and sentence2
+        """
+        words_sentence1 = set(sentence1)
+        words_sentence2 = set(sentence2)
+
+        numerator = len(words_sentence1.intersection(words_sentence2))
+        denominator = len(words_sentence1.union(words_sentence2))
+        score = numerator / denominator
+        
+        return score 
+
+
+    def calculate_shared_gram_score(self, sentence):
+        """
+        Args:
+            sentence (List[str]): Sentence whose shared_gram_score is to be calculated
+            
+        Returns:
+            score (float): Sum of similarity between sentence and all other sentences in document
+        """
+        score = 0.0
+        
+        for individual_sentence in self.text:
+            if individual_sentence == sentence or individual_sentence[0] == '@':
+                continue
+            score += self.shared_grams_sentences(sentence, individual_sentence)
+
+        return score
+
+
+    def friends_sentences(self, sentence1, sentence2):
+        """
+        Args:
+            sentence1 (List[str]): Sentence one
+            sentence2 (List[str]): Sentence two
+            
+        Returns:
+            score (float): Friends score between sentence1 and sentence2
+        """
+        # Template code so program compiles
+        
+        return 0.0
+
+
+    def calculate_friends_score(self, sentence):
+        """
+        Args:
+            sentence (List[str]): Sentence whose friends_score is to be calculated
+            
+        Returns:
+            score (float): Sum of similarity between sentence and all other sentences in document
+        """
+        score = 0.0
+        
+        for individual_sentence in self.text:
+            if individual_sentence == sentence or individual_sentence[0] == '@':
+                continue
+            score += self.friends_sentences(sentence, individual_sentence)
+
+        return score
+
+        
+    def sentence_centrality(self):
+        """
+        Returns:
+            feature_val_list (List[float]): Sentence centrality feature values
+        """
+        feature_val_list = []
+        
+        n = len(self.text)
+        for sentence in self.text:
+            if sentence[0] == '@':
+                continue
+            similarity_score = self.calculate_similarity(sentence, self.text)
+            shared_grams_score = self.calculate_shared_gram_score(sentence, self.text)
+            #print(similarity_score, shared_grams_score)
+            score = (similarity_score + shared_grams_score) / (n-1)
+            feature_val_list.append(score)
+        
+        return feature_val_list
 
     def getfeaturevec(self,doc = None,setngrams = None):
         if doc is not "":
@@ -63,11 +254,14 @@ class FeatureGen:
 
         # put your feature functions below
         self.feature_vector_list.append(self.get_Topic_Sentence_Feature)
+        # Create sentence frequencies
+        self.sentence_frequency()
+        self.feature_vector_list.append(self.sentence_centrality)
 
 
 
 
-
+        # Transpose this before returning
         return np.array(self.feature_vector_list)
 
 
