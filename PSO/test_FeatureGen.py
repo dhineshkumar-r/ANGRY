@@ -1,5 +1,5 @@
 # Integration test for FeatureGen class
-from FeatureGen import FeatureGen 
+from .FeatureGen import FeatureGen
 
 document = [['।@', 'भारत', 'में', 'राष्ट्रवाद।'],
 ['जैसा', 'कि', 'आप', 'देख', 'चुके', 'है,', 'यूरोप', 'में', 'आधुनिक', 'राष्ट्रवाद', 'के', 'साथ', 'ही', 'राष्ट्र-राज्यों', 'का', 'भी', 'उदय', 'हुआ'],

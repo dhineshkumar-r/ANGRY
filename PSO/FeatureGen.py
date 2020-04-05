@@ -38,7 +38,7 @@ class FeatureGen:
 
         for sentence in self.text:
             first_word = sentence[0]
-            if first_word == '।@':
+            if first_word == '@':
                 title_tokens = sentence[1:]
                 title_2grams = list(self.create_ngrams(title_tokens, 2).keys())
                 title_3grams = list(self.create_ngrams(title_tokens, 3).keys())
