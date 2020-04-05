@@ -46,7 +46,7 @@ class Tokenizer:
 
     @staticmethod
     def to_sentences(text: str) -> List[str]:
-        return [s.strip() for s in text.split(u"।")]
+        return [s.strip() for s in text.replace("?", u"।").split(u"।")]
 
     @staticmethod
     def to_words(sentence: str) -> List[str]:
