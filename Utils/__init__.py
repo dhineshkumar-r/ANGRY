@@ -19,13 +19,13 @@ def load_documents(file_name, ref_dir):
     ref = []
     for r_fn in os.listdir(ref_dir):
         parser = PlaintextParser.from_file(ref_dir + "/" + r_fn, t)
-
+        doc = []
         for s in parser.document.sentences:
             words = s.words
             if len(words) != 1:
-                document.append(words)
+                doc.append(words)
 
-        ref.append(document)
+        ref.append(doc)
 
     return document, ref
 
