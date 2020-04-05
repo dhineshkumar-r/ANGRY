@@ -16,3 +16,14 @@ def extract_features(tokenized_doc):
 
     return feature_vector
 
+
+def join_sentences(doc):
+    return " ".join([" ".join(_) for _ in doc])
+
+
+def join_docs(docs):
+    return [join_sentences(d) for d in docs]
+
+
+def generate_summary(doc):
+    return "।\n".join([" ".join(_) for _ in doc])

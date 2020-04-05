@@ -1,37 +1,28 @@
 import Utils
 import numpy as np
-from PSO import Particle
-
-
-def join_sentences(doc):
-    return " ".join([" ".join(_) for _ in doc])
-
-
-def join_docs(docs):
-    return [join_sentences(d) for d in docs]
+import PSO
 
 
 class Swarm:
 
-    def __init__(self, document, ref_sum, n_features=3, n_particles=3, n_iterations=100, w=0.5, c1=1, c2=1,
+    def __init__(self, document, ref_sum, n_features=3, n_particles=3, n_iterations=20, w=0.5, c1=1, c2=1,
                  sum_size=75):
         self.document = document
-        self.ref_sum = join_docs(ref_sum)
+        self.ref_sum = PSO.join_docs(ref_sum)
         self.n_features = n_features
         self.iter = n_iterations
-        self.particles = [Particle(self.n_features) for _ in range(n_particles)]
-        self.g_best = Particle(self.n_features)
+        self.particles = [PSO.Particle(self.n_features) for _ in range(n_particles)]
+        self.g_best = PSO.Particle(self.n_features)
         self.sum_size = sum_size
         self.run_sum = np.full(self.n_features, 0, dtype=int)
         self.w = w
         self.c1 = c1
         self.c2 = c2
         self.features = None
-        self.ref_sum = None
 
     def fitness(self, p):
         p_sum_idx = np.argsort(np.dot(self.features, p.pos))[-self.sum_size:]
-        p_sum = join_sentences([self.document[idx] for idx in p_sum_idx])
+        p_sum = PSO.join_sentences([self.document[idx] for idx in p_sum_idx])
         return Utils.calculate_rouge(p_sum, self.ref_sum, 1)
 
     # TODO Dynamically updating inertia.
@@ -51,6 +42,7 @@ class Swarm:
                 if f_v > self.g_best.f_value:
                     self.g_best = p
 
+            print("Iteration: " + str(_+1) + " Rouge score: " + str(self.g_best.f_value) + " Best feature: ", self.g_best.pos)
             # Update other particles' variables with respect to the best particle.
             for p in self.particles:
                 p.update_particle(self.g_best, self.w, self.c1, self.c2)
