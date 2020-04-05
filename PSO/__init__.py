@@ -1,6 +1,6 @@
 from .particle import Particle
 from .swarm import Swarm
-from FeatureGen import FeatureGen
+from .FeatureGen import FeatureGen
 
 
 def extract_features(tokenized_doc):
