@@ -31,8 +31,14 @@ def load_documents(file_name, ref_dir):
 
 
 def process_document(document):
+    stop_words = load_stop_words()
     for i, s in enumerate(document):
-        document[i] = list(map(process_word, s))
+        q = []
+        for word in s:
+            if word not in stop_words:
+                q.append(word)
+
+        document[i] = list(map(process_word, q))
     return document
 
 
