@@ -243,6 +243,46 @@ class FeatureGen:
             
         return feature_val_list
 
+    def get_freq_term_summary(self):
+
+        freq_terms = set()  # tij >= 0.5 of LS
+        for term in self.sentence_frequency_dict.keys():
+            if self.sentence_frequency_dict[term] >= math.floor(0.5 * self.summary_length) and term != 'length':
+                freq_terms.add(term)
+        return freq_terms
+
+    def find_htfs(self):
+        max_score = float('-inf')
+
+        for each_sent in self.text:
+            if each_sent[0] != '|@':
+                term_frequency_dict = self.term_frequency(each_sent)  # tfij
+                weight = 0
+                for word in set(each_sent):
+                    inv_doc_score = self.inverse_sentence_frequency(word)
+                    weight += term_frequency_dict[word] * inv_doc_score
+
+                max_score = max(max_score, weight)  # HTFS
+        return max_score
+
+    def word_sentence_score(self):
+
+        htfs = self.find_htfs()
+        freq_terms = self.get_freq_term_summary()
+        res = []
+        for each_sent in self.text:
+            if each_sent[0] != '|@':
+                term_frequency_dict = self.term_frequency(each_sent)  # tfij
+                weight = 0
+                for word in set(each_sent):
+                    if word in freq_terms:
+                        inv_doc_score = self.inverse_sentence_frequency(word)
+                        weight += term_frequency_dict[word] * inv_doc_score
+                ans = 0.1 + (weight / htfs)
+                res.append(ans)
+
+        return res
+
     def getfeaturevec(self,doc = None,setngrams = None):
         if doc is not "":
             self.text = doc
@@ -257,6 +297,7 @@ class FeatureGen:
         self.sentence_frequency()
         self.feature_vector_list.append(self.sentence_centrality())
 
+        self.feature_vector_list.append(self.word_sentence_score())
 
         return np.array(self.feature_vector_list).T
 
