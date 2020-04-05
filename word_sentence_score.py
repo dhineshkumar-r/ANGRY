@@ -82,7 +82,6 @@ def find_htfs(document):
 
 def word_sentence_score(document):
 
-
     htfs = find_htfs(document)
     freq_terms = get_freq_term_summary(document)
     res = []
@@ -97,8 +96,6 @@ def word_sentence_score(document):
         ans = 0.1 + (weight/htfs)
         res.append(ans)
 
-    for i in range(len(document)):
-        print(document[i], res[i])
     return res
 
 word_sentence_score(document)
