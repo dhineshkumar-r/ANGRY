@@ -256,7 +256,7 @@ class FeatureGen:
         max_score = float('-inf')
 
         for each_sent in self.text:
-            if each_sent[0] != '|@':
+            if each_sent[0] != '।@':
                 term_frequency_dict = self.term_frequency(each_sent)  # tfij
                 weight = 0
                 for word in set(each_sent):
@@ -272,7 +272,7 @@ class FeatureGen:
         freq_terms = self.get_freq_term_summary()
         res = []
         for each_sent in self.text:
-            if each_sent[0] != '|@':
+            if each_sent[0] != '।@':
                 term_frequency_dict = self.term_frequency(each_sent)  # tfij
                 weight = 0
                 for word in set(each_sent):
