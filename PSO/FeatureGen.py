@@ -39,18 +39,20 @@ class FeatureGen:
         for sentence in self.text:
             first_word = sentence[0]
             if first_word == '।@':
-                title_tokens = sentence[2:]
+                title_tokens = sentence[1:]
                 title_2grams = list(self.create_ngrams(title_tokens, 2).keys())
                 title_3grams = list(self.create_ngrams(title_tokens, 3).keys())
                 title_ngrams = set(title_2grams + title_3grams)
+                #print(title_ngrams)
 
             else:
 
-                sent_2grams = self.create_ngrams(sentence, 2)
-                sent_3grams = self.create_ngrams(sentence, 3)
+                sent_2grams = list(self.create_ngrams(sentence, 2).keys())
+                sent_3grams = list(self.create_ngrams(sentence, 3).keys())
                 sent_ngrams = set(sent_2grams + sent_3grams)
                 feature_val = len(sent_ngrams.intersection(title_ngrams))/len(sent_ngrams.union(title_ngrams))
                 feature_val_list.append(feature_val)
+                #print( sent_ngrams)
         return feature_val_list
 
     def term_frequency(self, sentence):
