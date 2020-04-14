@@ -23,10 +23,10 @@ model = PSO.Swarm(processed_doc, processed_ref_sum)
 weights = model.train(features)
 
 # Generate summary with weights.
-p_sum_idx = np.argsort(np.dot(features, weights))[-75:]
-p_sum = PSO.generate_summary([document[idx] for idx in p_sum_idx])
-p_sum1 = PSO.join_sentences([processed_doc[idx] for idx in p_sum_idx])
-ref_sum = PSO.join_docs(processed_ref_sum)
+p_sum_idx = np.argsort(np.dot(features, weights))[-PSO.SUMMARY_SIZE:]
+p_sum = Utils.generate_summary([document[idx] for idx in p_sum_idx])
+p_sum1 = Utils.join_sentences([processed_doc[idx] for idx in p_sum_idx])
+ref_sum = Utils.join_docs(processed_ref_sum)
 print("Final Rouge Score: ", Utils.calculate_rouge(p_sum1, ref_sum, 1))
 
 f = open("predicted_summary.txt", 'w', encoding='utf-8')

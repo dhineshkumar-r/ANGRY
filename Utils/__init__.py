@@ -7,6 +7,18 @@ from sumy.parsers.plaintext import PlaintextParser
 import os
 
 
+def join_sentences(doc):
+    return " ".join([" ".join(_) for _ in doc])
+
+
+def join_docs(docs):
+    return [join_sentences(d) for d in docs]
+
+
+def generate_summary(doc):
+    return "।\n".join([" ".join(_) for _ in doc])
+
+
 def load_documents(file_name, ref_dir):
     t = Utils.Tokenizer()
     parser = PlaintextParser.from_file(file_name, t)
