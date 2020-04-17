@@ -1,7 +1,7 @@
 import math
 import numpy as np
 from collections import defaultdict
-
+from .constants import *
 
 class FeatureGen:
     def __init__(self, chapter="", n_grams=2, summary_len=75):
@@ -304,7 +304,7 @@ class FeatureGen:
 
         return res
 
-    def generate_friends(self, sentence, similarity_threshold=0.12):
+    def generate_friends(self, sentence, similarity_threshold):
         """
         Args:
             sentence (List[str]): Each sentence in text
@@ -331,7 +331,7 @@ class FeatureGen:
         # Create sentence frequencies
         self.sentence_frequency()
         for sentence in self.text:
-            self.generate_friends(sentence)
+            self.generate_friends(sentence, SIMILARITY_THRESHOLD)
             
         self.feature_vector_list.append(self.sentence_centrality())
 
