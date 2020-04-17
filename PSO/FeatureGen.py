@@ -162,11 +162,14 @@ class FeatureGen:
         Returns:
             score (float): Shared gram score between sentence1 and sentence2
         """
-        words_sentence1 = set(sentence1)
-        words_sentence2 = set(sentence2)
+        words_sentence1 = set(self.create_ngrams(sentence1, 1).keys())
+        words_sentence2 = set(self.create_ngrams(sentence2, 1).keys())
 
         numerator = len(words_sentence1.intersection(words_sentence2))
         denominator = len(words_sentence1.union(words_sentence2))
+
+        if denominator == 0:
+            return 0
         score = numerator / denominator
 
         return score
@@ -182,7 +185,7 @@ class FeatureGen:
         score = 0.0
 
         for individual_sentence in self.text:
-            if individual_sentence == sentence or individual_sentence[0] == '।@':
+            if individual_sentence == sentence or individual_sentence[0] == '@':
                 continue
             score += self.shared_grams_sentences(sentence, individual_sentence)
 
