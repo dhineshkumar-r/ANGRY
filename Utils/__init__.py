@@ -1,10 +1,14 @@
 from .Utils import Tokenizer
 from collections import defaultdict
 import json
+import random
 import numpy as np
 from typing import List
 from sumy.parsers.plaintext import PlaintextParser
 import os
+
+
+randBinList = lambda n: [random.randint(0, 1) for _ in range(1, n + 1)]
 
 
 def join_sentences(doc):
@@ -17,6 +21,25 @@ def join_docs(docs):
 
 def generate_summary(doc):
     return "।\n".join([" ".join(_) for _ in doc])
+
+
+def load_document(doc_fname, ref_fname):
+    t = Utils.Tokenizer()
+    parser = PlaintextParser.from_file(doc_fname, t)
+    document = []
+    for s in parser.document.sentences:
+        words = s.words
+        if len(words) != 1:
+            document.append(words)
+
+    r_parser = PlaintextParser.from_file(ref_fname, t)
+    reference = []
+    for s in r_parser.document.sentences:
+        words = s.words
+        if len(words) != 1:
+            reference.append(words)
+
+    return document, reference
 
 
 def load_documents(file_name, ref_dir):

@@ -1,5 +1,5 @@
 from .particle import Particle
-from .swarm import Swarm
+from .swarm import Swarm, Swarm2
 from .FeatureGen import FeatureGen
 from .constants import *
 
