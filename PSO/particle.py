@@ -7,9 +7,9 @@ class Particle:
 
     def __init__(self, n_features):
         self.pos = np.array(Utils.randBinList(n_features))
-        self.vel = np.full(n_features, 0)
         self.v_max = V_MAX
         self.v_min = V_MIN
+        self.vel = np.random.uniform(low=-4, high=4, size=(n_features,))
         self.p_best_pos = self.pos
         self.n_feat = n_features
         self.f_value = float("-inf")

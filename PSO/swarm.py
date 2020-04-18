@@ -49,7 +49,7 @@ class Swarm2:
                 if f_v > self.g_best.f_value:
                     self.g_best = p
 
-            print("Iteration: " + str(_ + 1) + " Rouge score: " + str(self.g_best.f_value) + " Best feature: ",
+            print("Iteration: " + str(_ + 1) + " Fitness: " + str(self.g_best.f_value) + " Best feature: ",
                   self.g_best.pos)
 
             self.w = self.__update_inertia(_)

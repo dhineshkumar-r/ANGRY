@@ -35,6 +35,7 @@ def pso_train(doc_dir, ref_dir):
         rouge_scores[i] = Utils.calculate_rouge(p_sum, references[i], 1)
 
     print(rouge_scores)
+    print(weights)
     return weights
 
 
