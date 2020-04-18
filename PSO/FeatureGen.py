@@ -4,12 +4,14 @@ from collections import defaultdict
 from .constants import *
 
 class FeatureGen:
-    def __init__(self, chapter="", n_grams=2, summary_len=75, sim_th=SIMILARITY_THRESHOLD):
+    def __init__(self, chapter="", n_grams=2, summary_len=75, sim_th=SIMILARITY_THRESHOLD, max_th=MAX_SENT_THRESHOLD, min_th=MIN_SENT_THRESHOLD):
         # chapter = prep-processed text doc
         self.text = chapter
         self.summary_length = summary_len
         self.n_grams = n_grams
         self.sim_th = sim_th
+        self.max_th = max_th
+        self.min_th =min_th
         # let this be lists of lists, where each feature value is stored in a list with indices corresponding to sentence number
         self.feature_vector_list = []
         # For calculating word frequency in sentence
@@ -267,9 +269,9 @@ class FeatureGen:
 
     def get_freq_term_summary(self):
 
-        freq_terms = set()  # tij >= 0.5 of LS
+        freq_terms = set()  
         for term in self.sentence_frequency_dict.keys():
-            if self.sentence_frequency_dict[term] >= math.floor(0.5 * self.summary_length) and term != 'length':
+            if self.sentence_frequency_dict[term] >= math.floor(self.min_th * self.summary_length) and self.sentence_frequency_dict[term] <= math.floor(self.max_th * self.summary_length) and term != 'length':
                 freq_terms.add(term)
         return freq_terms
 
