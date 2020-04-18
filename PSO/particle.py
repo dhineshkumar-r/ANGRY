@@ -6,7 +6,7 @@ from .constants import *
 class Particle:
 
     def __init__(self, n_features):
-        self.pos = np.full(n_features, 0, dtype=int)
+        self.pos = np.array(Utils.randBinList(n_features))
         self.vel = np.full(n_features, 0)
         self.v_max = V_MAX
         self.v_min = V_MIN
