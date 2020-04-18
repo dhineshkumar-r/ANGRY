@@ -1,7 +1,7 @@
 import math
 import numpy as np
 from collections import defaultdict
-
+from .constants import *
 
 class FeatureGen:
     def __init__(self, chapter="", n_grams=2, summary_len=75):
@@ -13,6 +13,8 @@ class FeatureGen:
         self.feature_vector_list = []
         # For calculating word frequency in sentence
         self.sentence_frequency_dict = dict()
+        self.sentence_similarity_dict = dict()
+        self.shared_friends_dict = dict()
 
     def setdoc(self, new_chapter):
         self.text = new_chapter
@@ -75,7 +77,7 @@ class FeatureGen:
             frequencies[key] = frequencies[key] / len(sentence)
 
         return frequencies
-
+                    
     def sentence_frequency(self):
 
         self.sentence_frequency_dict["length"] = len(self.text)
@@ -112,6 +114,13 @@ class FeatureGen:
         Returns:
             score (float): Similarity score between sentence1 and sentence2
         """
+        sentence1_string = ' '.join(sentence1)
+        sentence2_string = ' '.join(sentence2)
+        if sentence1_string in self.sentence_similarity_dict:
+            if sentence2_string in self.sentence_similarity_dict[sentence1_string]:
+                return self.sentence_similarity_dict[sentence1_string][sentence2_string]
+        else:
+            self.sentence_similarity_dict[sentence1_string] = dict()
         tf_sentence1_dict = self.term_frequency(sentence1)
         tf_sentence2_dict = self.term_frequency(sentence2)
 
@@ -130,10 +139,12 @@ class FeatureGen:
 
         denominator = (denominator1 ** 0.5) * (denominator2 ** 0.5)
         if denominator == 0.0:
+            self.sentence_similarity_dict[sentence1_string][sentence2_string] = 0.0
             return 0.0
 
         score = numerator / denominator
-        # TODO: Implement simmilarity threshold
+        self.sentence_similarity_dict[sentence1_string][sentence2_string] = score
+        
         return score
 
     def calculate_similarity(self, sentence):
@@ -162,11 +173,15 @@ class FeatureGen:
         Returns:
             score (float): Shared gram score between sentence1 and sentence2
         """
-        words_sentence1 = set(sentence1)
-        words_sentence2 = set(sentence2)
+        words_sentence1 = set(self.create_ngrams(sentence1, 1).keys())
+        words_sentence2 = set(self.create_ngrams(sentence2, 1).keys())
 
         numerator = len(words_sentence1.intersection(words_sentence2))
         denominator = len(words_sentence1.union(words_sentence2))
+
+        if denominator == 0:
+            return 0
+        
         score = numerator / denominator
 
         return score
@@ -182,7 +197,7 @@ class FeatureGen:
         score = 0.0
 
         for individual_sentence in self.text:
-            if individual_sentence == sentence or individual_sentence[0] == '।@':
+            if individual_sentence == sentence or individual_sentence[0] == '@':
                 continue
             score += self.shared_grams_sentences(sentence, individual_sentence)
 
@@ -198,8 +213,20 @@ class FeatureGen:
             score (float): Friends score between sentence1 and sentence2
         """
         # Template code so program compiles
+        sentence1_string = ' '.join(sentence1)
+        sentence2_string = ' '.join(sentence2)
+        
+        sentence1_friends = set(self.shared_friends_dict[sentence1_string])
+        sentence2_friends = set(self.shared_friends_dict[sentence2_string])
 
-        return 0.0
+        numerator = len(sentence1_friends.intersection(sentence2_friends))
+        denominator = len(sentence1_friends.union(sentence2_friends))
+
+        if denominator == 0:
+            return 0
+        score = numerator / denominator
+
+        return score 
 
     def calculate_friends_score(self, sentence):
         """
@@ -215,7 +242,7 @@ class FeatureGen:
             if individual_sentence == sentence or individual_sentence[0] == '@':
                 continue
             score += self.friends_sentences(sentence, individual_sentence)
-
+        
         return score
 
     def sentence_centrality(self):
@@ -230,8 +257,9 @@ class FeatureGen:
                 continue
             similarity_score = self.calculate_similarity(sentence)
             shared_grams_score = self.calculate_shared_gram_score(sentence)
-            # print(similarity_score, shared_grams_score)
-            score = (similarity_score + shared_grams_score) / (n - 1)
+            shared_friends_score = self.calculate_friends_score(sentence)
+            #print(similarity_score, shared_grams_score, shared_friends_score)
+            score = (similarity_score + shared_grams_score + shared_friends_score) / (n - 1)
             feature_val_list.append(score)
 
         return feature_val_list
@@ -276,6 +304,21 @@ class FeatureGen:
 
         return res
 
+    def generate_friends(self, sentence, similarity_threshold):
+        """
+        Args:
+            sentence (List[str]): Each sentence in text
+            similarity_threshold (float): Similarity threshold to identify a friend
+        """
+        sentence_string = ' '.join(sentence)
+        self.shared_friends_dict[sentence_string] = []
+        for individual_sentence in self.text:
+            if individual_sentence == sentence or individual_sentence[0] == '@':
+                continue
+            similarity_score = self.calculate_similarity_sentences(sentence, individual_sentence)
+            if similarity_score >= similarity_threshold:
+                self.shared_friends_dict[sentence_string].append(' '.join(individual_sentence))
+    
     def getfeaturevec(self, doc=None, setngrams=None):
         if doc is not "":
             self.text = doc
@@ -287,6 +330,9 @@ class FeatureGen:
         self.feature_vector_list.append(self.get_Topic_Sentence_Feature())
         # Create sentence frequencies
         self.sentence_frequency()
+        for sentence in self.text:
+            self.generate_friends(sentence, SIMILARITY_THRESHOLD)
+            
         self.feature_vector_list.append(self.sentence_centrality())
 
         self.feature_vector_list.append(self.word_sentence_score())
