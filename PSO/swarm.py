@@ -7,7 +7,8 @@ from .constants import *
 class Swarm2:
 
     def __init__(self, documents, ref_sums, n_features=NUMBER_OF_FEATURES, n_particles=NUMBER_OF_PARTICLES,
-                 n_iterations=NUMBER_OF_ITERATIONS, w=0.9, c1=C1, c2=C2, sum_size=SUMMARY_SIZE):
+                 n_iterations=NUMBER_OF_ITERATIONS, w=0.9, c1=C1, c2=C2, sum_size=SUMMARY_SIZE, config  = None):
+        self.config = config
         self.documents = documents
         self.ref_sums = ref_sums
         self.n_features = n_features
@@ -17,8 +18,8 @@ class Swarm2:
         self.sum_size = sum_size
         self.run_sum = np.full(self.n_features, 0, dtype=int)
         self.w = w
-        self.w_min = W_MIN
-        self.w_max = W_MAX
+        self.w_min = config.w_min
+        self.w_max = config.w_min
         self.c1 = c1
         self.c2 = c2
         self.features = None

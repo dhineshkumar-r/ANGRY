@@ -44,17 +44,22 @@ class FeatureGen:
         for sentence in self.text:
             first_word = sentence[0]
             if first_word == '@':
-                title_tokens = sentence[1:]
-                title_2grams = list(self.create_ngrams(title_tokens, 2).keys())
-                title_3grams = list(self.create_ngrams(title_tokens, 3).keys())
-                title_ngrams = set(title_2grams + title_3grams)
+                title_ngrams = set()
+                i = 1
+                while(i<= self.n_grams):
+                    title_tokens = sentence[1:]
+                    title_ngrams = title_ngrams.union(set(list(self.create_ngrams(title_tokens, i).keys())))
+                    i+=1
+
                 # print(title_ngrams)
 
             else:
+                sent_ngrams  = set()
+                i = 1
+                while(i<= self.n_grams):
 
-                sent_2grams = list(self.create_ngrams(sentence, 2).keys())
-                sent_3grams = list(self.create_ngrams(sentence, 3).keys())
-                sent_ngrams = set(sent_2grams + sent_3grams)
+                    sent_ngrams = sent_ngrams.union(set(list(self.create_ngrams(sentence, i).keys())))
+                    i+=1
                 feature_val = len(sent_ngrams.intersection(title_ngrams)) / len(sent_ngrams.union(title_ngrams))
                 feature_val_list.append(feature_val)
                 # print( sent_ngrams)
