@@ -166,7 +166,7 @@ class FeatureGen:
         score = 0.0
 
         for individual_sentence in self.text:
-            if individual_sentence == sentence or individual_sentence[0] == '।@':
+            if individual_sentence == sentence or individual_sentence[0] == '@':
                 continue
             score += self.calculate_similarity_sentences(sentence, individual_sentence)
 

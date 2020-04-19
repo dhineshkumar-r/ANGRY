@@ -7,8 +7,14 @@ from typing import List
 from sumy.parsers.plaintext import PlaintextParser
 import os
 
-
 randBinList = lambda n: [random.randint(0, 1) for _ in range(1, n + 1)]
+
+
+def remove_headings(doc):
+    n_doc = []
+    for s in doc:
+        if s[0] != '@':
+            n_doc.append(s)
 
 
 def join_sentences(doc):
@@ -65,9 +71,9 @@ def load_documents(file_name, ref_dir):
     return document, ref
 
 
-def process_document(document,use_stop_words = True, use_lemmatizer= True):
+def process_document(document, use_stop_words=True, use_lemmatizer=True):
     stop_words = set()
-    if  use_stop_words is True:
+    if use_stop_words is True:
         stop_words = load_stop_words()
     p_doc = []
     for i, s in enumerate(document):
@@ -95,10 +101,10 @@ def process_word(w):
     word = Tokenizer.stem_word(word)
     return word
 
+
 def process_only_clean_word(w):
     word = Tokenizer.clean_word(w)
     return word
-
 
 
 def load_stop_words():
