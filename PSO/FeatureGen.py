@@ -4,12 +4,14 @@ from collections import defaultdict
 from .constants import *
 
 class FeatureGen:
-    def __init__(self, chapter="", n_grams=2, summary_len=75, sim_th=SIMILARITY_THRESHOLD):
+    def __init__(self, chapter="", n_grams=2, summary_len=75, sim_th=SIMILARITY_THRESHOLD, max_th=MAX_SENT_THRESHOLD, min_th=MIN_SENT_THRESHOLD):
         # chapter = prep-processed text doc
         self.text = chapter
         self.summary_length = summary_len
         self.n_grams = n_grams
         self.sim_th = sim_th
+        self.max_th = max_th
+        self.min_th =min_th
         # let this be lists of lists, where each feature value is stored in a list with indices corresponding to sentence number
         self.feature_vector_list = []
         # For calculating word frequency in sentence
@@ -42,17 +44,22 @@ class FeatureGen:
         for sentence in self.text:
             first_word = sentence[0]
             if first_word == '@':
-                title_tokens = sentence[1:]
-                title_2grams = list(self.create_ngrams(title_tokens, 2).keys())
-                title_3grams = list(self.create_ngrams(title_tokens, 3).keys())
-                title_ngrams = set(title_2grams + title_3grams)
+                title_ngrams = set()
+                i = 1
+                while(i<= self.n_grams):
+                    title_tokens = sentence[1:]
+                    title_ngrams = title_ngrams.union(set(list(self.create_ngrams(title_tokens, i).keys())))
+                    i+=1
+
                 # print(title_ngrams)
 
             else:
+                sent_ngrams  = set()
+                i = 1
+                while(i<= self.n_grams):
 
-                sent_2grams = list(self.create_ngrams(sentence, 2).keys())
-                sent_3grams = list(self.create_ngrams(sentence, 3).keys())
-                sent_ngrams = set(sent_2grams + sent_3grams)
+                    sent_ngrams = sent_ngrams.union(set(list(self.create_ngrams(sentence, i).keys())))
+                    i+=1
                 feature_val = len(sent_ngrams.intersection(title_ngrams)) / len(sent_ngrams.union(title_ngrams))
                 feature_val_list.append(feature_val)
                 # print( sent_ngrams)
@@ -267,9 +274,9 @@ class FeatureGen:
 
     def get_freq_term_summary(self):
 
-        freq_terms = set()  # tij >= 0.5 of LS
+        freq_terms = set()  
         for term in self.sentence_frequency_dict.keys():
-            if self.sentence_frequency_dict[term] >= math.floor(0.5 * self.summary_length) and term != 'length':
+            if self.sentence_frequency_dict[term] >= math.floor(self.min_th * self.summary_length) and self.sentence_frequency_dict[term] <= math.floor(self.max_th * self.summary_length) and term != 'length':
                 freq_terms.add(term)
         return freq_terms
 
