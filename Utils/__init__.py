@@ -15,6 +15,7 @@ def remove_headings(doc):
     for s in doc:
         if s[0] != '@':
             n_doc.append(s)
+    return n_doc
 
 
 def join_sentences(doc):
