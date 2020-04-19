@@ -5,7 +5,8 @@ import os
 import PSO
 import Utils
 
-def textrank_test(doc_dir, ref_dir, summary_length = 75):
+
+def textrank_test(doc_dir, ref_dir, summary_length=75):
     """
     Args:
         doc_dir (str): Input chapters directory
@@ -32,7 +33,7 @@ def textrank_test(doc_dir, ref_dir, summary_length = 75):
         # Perform Textrank
         parser = PlaintextParser.from_file(doc_dir + "/" + d, Utils.Tokenizer())
         summarizer = TextRankSummarizer()
-        #summarizer.stop_words = Utils.load_stop_words()
+        # summarizer.stop_words = Utils.load_stop_words()
         summary = summarizer(parser.document, summary_length)
         p_sum = ""
         for sentence in summary:
@@ -42,6 +43,7 @@ def textrank_test(doc_dir, ref_dir, summary_length = 75):
         rogue_index += 1
 
     print(rouge_scores)
-        
+
+
 if __name__ == "__main__":
     textrank_test('train/documents', 'train/references')
