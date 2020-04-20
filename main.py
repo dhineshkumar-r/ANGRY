@@ -57,6 +57,7 @@ elif config.mode == "test":
     test_summaries = pso_test("test/documents", "test/references", w, config)
     i = 1
     for sum in test_summaries:
-        outfile = open('PSO_sum_'+str(i)+".txt",'w+')
+        outfile = open('PSO_sum_'+str(i)+".txt",'w', encoding='utf-8')
         i+=1
         outfile.write(sum)
+        outfile.close()

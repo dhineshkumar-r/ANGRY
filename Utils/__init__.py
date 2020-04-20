@@ -7,10 +7,13 @@ from typing import List
 from sumy.parsers.plaintext import PlaintextParser
 import os
 
+random.seed(0)
+np.random.seed(0)
+
 randBinList = lambda n: [random.randint(0, 1) for _ in range(1, n + 1)]
 
 
-def remove_headings(doc):
+def remove_headings(doc) -> List[List[str]]:
     n_doc = []
     for s in doc:
         if s[0] != '@':
@@ -18,15 +21,15 @@ def remove_headings(doc):
     return n_doc
 
 
-def join_sentences(doc):
+def join_sentences(doc) -> str:
     return " ".join([" ".join(_) for _ in doc])
 
 
-def join_docs(docs):
+def join_docs(docs) -> List[str]:
     return [join_sentences(d) for d in docs]
 
 
-def generate_summary(doc):
+def generate_summary(doc) -> str:
     return "।\n".join([" ".join(_) for _ in doc])
 
 
@@ -72,7 +75,7 @@ def load_documents(file_name, ref_dir):
     return document, ref
 
 
-def process_document(document, use_stop_words=True, use_lemmatizer=True):
+def process_document(document, use_stop_words=True, use_lemmatizer=True) -> List[List[str]]:
     stop_words = set()
     if use_stop_words is True:
         stop_words = load_stop_words()
@@ -97,13 +100,13 @@ def process_documents(docs):
     return p_docs
 
 
-def process_word(w):
+def process_word(w) -> str:
     word = Tokenizer.clean_word(w)
     word = Tokenizer.stem_word(word)
     return word
 
 
-def process_only_clean_word(w):
+def process_only_clean_word(w) -> str:
     word = Tokenizer.clean_word(w)
     return word
 
@@ -128,6 +131,30 @@ def calculate_rouge(pred_sum: str, ref_sum: List[str], n: int):
 
     rouge = intersection_ngrams_count / total_ngrams_count
     return rouge
+
+
+def find_overlap(f1: str, f2: str):
+    f1_ngrams = create_ngrams(f1.split(" "), 1)
+    f2_ngrams = create_ngrams(f2.split(" "), 1)
+    intersection_ngrams_count = 0
+    for ngram in f1_ngrams.keys():
+        intersection_ngrams_count += min(f1_ngrams[ngram], f2_ngrams[ngram])
+
+    return intersection_ngrams_count
+
+
+def content_overlap_metric():
+    ref_sum, sum_75, = load_document("test/references/s_chap_6.txt", "PSO_sum_2.txt")
+    sum_25, sum_50 = load_document("PSO_sum_2_25.txt", "PSO_sum_2_50.txt")
+    p_ref_sum = join_sentences(process_document(ref_sum, use_stop_words=True, use_lemmatizer=False))
+    p_sum_75 = join_sentences(process_document(sum_75, use_stop_words=True, use_lemmatizer=False))
+    p_sum_25 = join_sentences(process_document(sum_25, use_stop_words=True, use_lemmatizer=False))
+    p_sum_50 = join_sentences(process_document(sum_50, use_stop_words=True, use_lemmatizer=False))
+    o_75 = find_overlap(p_ref_sum, p_sum_75)
+    o_50 = find_overlap(p_ref_sum, p_sum_50)
+    o_25 = find_overlap(p_ref_sum, p_sum_25)
+    print(o_75, o_50, o_25)
+    return
 
 
 def create_ngrams(tokens, n):

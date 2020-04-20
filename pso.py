@@ -37,7 +37,7 @@ def pso_train(doc_dir, ref_dir, config):
     for i, feature in enumerate(features):
         p_sum_idx = np.argsort(np.dot(feature, weights))[-config.summary_size:]
         p_sum = Utils.join_sentences([documents[i][idx] for idx in p_sum_idx])
-        rouge_scores[i] = Utils.calculate_rouge(p_sum, references[i], 1)
+        rouge_scores[i] = Utils.calculate_rouge(p_sum, [references[i]], 1)
 
     print(rouge_scores)
     print(weights)
@@ -73,7 +73,10 @@ def pso_test(doc_dir, ref_dir, weights, config):
         p_sum_idx = np.argsort(np.dot(feature, weights))[-config.summary_size:]
         p_sum = Utils.join_sentences([documents[i][idx] for idx in p_sum_idx])
         test_summaries.append(Utils.generate_summary([doc_wo_title[i][idx] for idx in p_sum_idx]))
-        rouge_scores[i] = Utils.calculate_rouge(p_sum, references[i], 1)
+        rouge_scores[i] = Utils.calculate_rouge(p_sum, [references[i]], 1)
 
     print(rouge_scores)
     return test_summaries
+
+
+Utils.content_overlap_metric()

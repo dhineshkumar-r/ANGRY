@@ -2,15 +2,16 @@ import Utils
 import numpy as np
 from .particle import Particle
 from .constants import *
+from typing import List
 
 
 class Swarm2:
 
     def __init__(self, documents, ref_sums, n_features=NUMBER_OF_FEATURES, n_particles=NUMBER_OF_PARTICLES,
-                 n_iterations=NUMBER_OF_ITERATIONS, w=0.9, c1=C1, c2=C2, sum_size=SUMMARY_SIZE, config  = None):
+                 n_iterations=NUMBER_OF_ITERATIONS, w=0.9, c1=C1, c2=C2, sum_size=SUMMARY_SIZE, config=None):
         self.config = config
-        self.documents = documents
-        self.ref_sums = ref_sums
+        self.documents: List[List[List[str]]] = documents
+        self.ref_sums: List[str] = ref_sums
         self.n_features = n_features
         self.max_iter = n_iterations
         self.particles = [Particle(self.n_features) for _ in range(n_particles)]
@@ -29,7 +30,7 @@ class Swarm2:
         for i, feature in enumerate(self.features):
             p_sum_idx = np.argsort(np.dot(feature, p.pos))[-self.sum_size:]
             p_sum = Utils.join_sentences([self.documents[i][idx] for idx in p_sum_idx])
-            rouge_scores[i] = Utils.calculate_rouge(p_sum, self.ref_sums[i], 1)
+            rouge_scores[i] = Utils.calculate_rouge(p_sum, [self.ref_sums[i]], 1)
         return sum(rouge_scores)
 
     def __update_inertia(self, i):
