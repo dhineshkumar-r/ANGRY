@@ -3,7 +3,7 @@ from collections import defaultdict
 import json
 import random
 import numpy as np
-from typing import List
+from typing import List, DefaultDict
 from sumy.parsers.plaintext import PlaintextParser
 import os
 
@@ -33,7 +33,7 @@ def generate_summary(doc) -> str:
     return "।\n".join([" ".join(_) for _ in doc])
 
 
-def load_document(doc_fname, ref_fname):
+def load_document(doc_fname, ref_fname) -> (List[str], List[str]):
     t = Utils.Tokenizer()
     parser = PlaintextParser.from_file(doc_fname, t)
     document = []
@@ -75,7 +75,7 @@ def load_documents(file_name, ref_dir):
     return document, ref
 
 
-def process_document(document, use_stop_words=True, use_lemmatizer=True) -> List[List[str]]:
+def process_document(document: List[List[str]], use_stop_words=True, use_lemmatizer=True) -> List[List[str]]:
     stop_words = set()
     if use_stop_words is True:
         stop_words = load_stop_words()
@@ -85,7 +85,7 @@ def process_document(document, use_stop_words=True, use_lemmatizer=True) -> List
         for word in s:
             if word not in stop_words:
                 q.append(word)
-        if use_lemmatizer is True:
+        if use_lemmatizer:
             p_doc.append(list(map(process_word, q)))
         else:
             p_doc.append(list(map(process_only_clean_word, q)))
@@ -93,20 +93,20 @@ def process_document(document, use_stop_words=True, use_lemmatizer=True) -> List
     return p_doc
 
 
-def process_documents(docs):
+def process_documents(docs: List[str]) -> List[List[List[str]]]:
     p_docs = []
     for d in docs:
         p_docs.append(process_document(d))
     return p_docs
 
 
-def process_word(w) -> str:
+def process_word(w: str) -> str:
     word = Tokenizer.clean_word(w)
     word = Tokenizer.stem_word(word)
     return word
 
 
-def process_only_clean_word(w) -> str:
+def process_only_clean_word(w: str) -> str:
     word = Tokenizer.clean_word(w)
     return word
 
@@ -133,7 +133,7 @@ def calculate_rouge(pred_sum: str, ref_sum: List[str], n: int):
     return rouge
 
 
-def find_overlap(f1: str, f2: str):
+def find_overlap(f1: str, f2: str) -> int:
     f1_ngrams = create_ngrams(f1.split(" "), 1)
     f2_ngrams = create_ngrams(f2.split(" "), 1)
     intersection_ngrams_count = 0
@@ -144,8 +144,8 @@ def find_overlap(f1: str, f2: str):
 
 
 def content_overlap_metric():
-    ref_sum, sum_75, = load_document("test/references/s_chap_6.txt", "PSO_sum_2.txt")
-    sum_25, sum_50 = load_document("PSO_sum_2_25.txt", "PSO_sum_2_50.txt")
+    ref_sum, sum_75, = load_document("test/references/s_chap_2.txt", "PSO_sum_1.txt")
+    sum_25, sum_50 = load_document("PSO_sum_1_25.txt", "PSO_sum_1_50.txt")
     p_ref_sum = join_sentences(process_document(ref_sum, use_stop_words=True, use_lemmatizer=False))
     p_sum_75 = join_sentences(process_document(sum_75, use_stop_words=True, use_lemmatizer=False))
     p_sum_25 = join_sentences(process_document(sum_25, use_stop_words=True, use_lemmatizer=False))
@@ -157,7 +157,7 @@ def content_overlap_metric():
     return
 
 
-def create_ngrams(tokens, n):
+def create_ngrams(tokens, n) -> DefaultDict:
     ngrams = defaultdict(int)
     for ngram in (tuple(tokens[i:i + n]) for i in range(len(tokens) - n + 1)):
         ngrams[ngram] += 1
