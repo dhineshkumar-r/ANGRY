@@ -20,10 +20,12 @@ def textrank_test(doc_dir, ref_dir, summary_length=75, stopwords=True):
     references = []
     for d, r in zip(docs, refs):
         doc, ref = Utils.load_document(doc_dir + "/" + d, ref_dir + "/" + r)
-        p_doc = Utils.process_document(doc)
+        p_doc_headings = Utils.process_document(doc)
+        p_doc = Utils.remove_headings(p_doc_headings)
         p_ref = Utils.process_document(ref)
         documents.append(p_doc)
-        references.append(p_ref)
+        #references.append(ref)#Raw reference
+        references.append(p_ref)#Processed reference
 
     references = Utils.join_docs(references)
 
@@ -31,16 +33,20 @@ def textrank_test(doc_dir, ref_dir, summary_length=75, stopwords=True):
     rogue_index = 0
     for d, r in zip(docs, refs):
         # Perform Textrank
-        parser = PlaintextParser.from_file(doc_dir + "/" + d, Utils.Tokenizer())
+        text = '। '.join(' '.join(item) for item in documents[rogue_index])
+        #parser = PlaintextParser.from_file(doc_dir + "/" + d, Utils.Tokenizer()) # Raw input
+        parser = PlaintextParser(text, Utils.Tokenizer()) # Processed input
         summarizer = TextRankSummarizer()
         if stopwords:
             summarizer.stop_words = Utils.load_stop_words()
         summary = summarizer(parser.document, summary_length)
         p_sum = ""
-        for sentence in summary:
-            p_sum += str(sentence) + " "
-
-        rouge_scores[rogue_index] = Utils.calculate_rouge(p_sum, references[rogue_index], 1)
+        with open("textrank_summary_" + d, 'w', encoding="utf-8") as output_file:
+            for sentence in summary:
+                output_file.write(str(sentence) + "।\n")
+                p_sum += str(sentence) + "। "
+            
+        rouge_scores[rogue_index] = Utils.calculate_rouge(p_sum, [references[rogue_index]], 1)
         rogue_index += 1
 
     print(rouge_scores)
