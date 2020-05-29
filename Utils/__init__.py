@@ -75,20 +75,17 @@ def load_documents(file_name, ref_dir):
     return document, ref
 
 
-def process_document(document: List[List[str]], use_stop_words=True, use_lemmatizer=True) -> List[List[str]]:
+def process_document(document: List[List[str]], use_stop_words="True", use_lemmatizer="True") -> List[List[str]]:
     stop_words = set()
-    if use_stop_words is True:
+    if use_stop_words == "True":
         stop_words = load_stop_words()
     p_doc = []
     for i, s in enumerate(document):
         q = []
         for word in s:
             if word not in stop_words:
-                q.append(word)
-        if use_lemmatizer:
-            p_doc.append(list(map(process_word, q)))
-        else:
-            p_doc.append(list(map(process_only_clean_word, q)))
+                q.append(process_word(word, use_lemmatizer))
+        p_doc.append(q)
 
     return p_doc
 
@@ -100,9 +97,11 @@ def process_documents(docs: List[str]) -> List[List[List[str]]]:
     return p_docs
 
 
-def process_word(w: str) -> str:
+def process_word(w: str, use_lemmatizer="True") -> str:
     word = Tokenizer.clean_word(w)
-    word = Tokenizer.stem_word(word)
+    if use_lemmatizer == "True":
+        word = Tokenizer.stem_word(word)
+
     return word
 
 
@@ -144,8 +143,8 @@ def find_overlap(f1: str, f2: str) -> int:
 
 
 def content_overlap_metric():
-    ref_sum, sum_75, = load_document("test/references/s_chap_2.txt", "PSO_sum_1.txt")
-    sum_25, sum_50 = load_document("PSO_sum_1_25.txt", "PSO_sum_1_50.txt")
+    ref_sum, sum_75, = load_document("train/references/s_chap_6.txt", "PSO_sum_2.txt")
+    sum_25, sum_50 = load_document("PSO_sum_2_25.txt", "PSO_sum_2_50.txt")
     p_ref_sum = join_sentences(process_document(ref_sum, use_stop_words=True, use_lemmatizer=False))
     p_sum_75 = join_sentences(process_document(sum_75, use_stop_words=True, use_lemmatizer=False))
     p_sum_25 = join_sentences(process_document(sum_25, use_stop_words=True, use_lemmatizer=False))

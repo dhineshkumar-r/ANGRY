@@ -31,7 +31,7 @@ class Swarm:
             p_sum_idx = np.argsort(np.dot(feature, p.pos))[-self.sum_size:]
             p_sum: str = Utils.join_sentences([self.documents[i][idx] for idx in p_sum_idx])
             rouge_scores[i] = Utils.calculate_rouge(p_sum, [self.ref_sums[i]], 1)
-        return sum(rouge_scores)
+        return sum(rouge_scores)/len(rouge_scores)
 
     def __update_inertia(self, i) -> float:
         return self.w_max - (self.w_max - self.w_min) * (i / self.max_iter)

@@ -4,14 +4,15 @@ from collections import defaultdict
 from .constants import *
 
 class FeatureGen:
-    def __init__(self, chapter="", n_grams=2, summary_len=75, sim_th=SIMILARITY_THRESHOLD, max_th=MAX_SENT_THRESHOLD, min_th=MIN_SENT_THRESHOLD):
+    def __init__(self, chapter="", n_grams=2, summary_len=75, sim_th=SIMILARITY_THRESHOLD, max_th=MAX_SENT_THRESHOLD,
+                 min_th=MIN_SENT_THRESHOLD):
         # chapter = prep-processed text doc
         self.text = chapter
         self.summary_length = summary_len
         self.n_grams = n_grams
         self.sim_th = sim_th
         self.max_th = max_th
-        self.min_th =min_th
+        self.min_th = min_th
         # let this be lists of lists, where each feature value is stored in a list with indices corresponding to sentence number
         self.feature_vector_list = []
         # For calculating word frequency in sentence
@@ -46,20 +47,19 @@ class FeatureGen:
             if first_word == '@':
                 title_ngrams = set()
                 i = 1
-                while(i<= self.n_grams):
+                while (i <= self.n_grams):
                     title_tokens = sentence[1:]
                     title_ngrams = title_ngrams.union(set(list(self.create_ngrams(title_tokens, i).keys())))
-                    i+=1
+                    i += 1
 
                 # print(title_ngrams)
 
             else:
-                sent_ngrams  = set()
+                sent_ngrams = set()
                 i = 1
-                while(i<= self.n_grams):
-
+                while (i <= self.n_grams):
                     sent_ngrams = sent_ngrams.union(set(list(self.create_ngrams(sentence, i).keys())))
-                    i+=1
+                    i += 1
                 feature_val = len(sent_ngrams.intersection(title_ngrams)) / len(sent_ngrams.union(title_ngrams))
                 feature_val_list.append(feature_val)
                 # print( sent_ngrams)
@@ -85,7 +85,7 @@ class FeatureGen:
             frequencies[key] = frequencies[key] / len(sentence)
 
         return frequencies
-                    
+
     def sentence_frequency(self):
 
         self.sentence_frequency_dict["length"] = len(self.text)
@@ -152,7 +152,7 @@ class FeatureGen:
 
         score = numerator / denominator
         self.sentence_similarity_dict[sentence1_string][sentence2_string] = score
-        
+
         return score
 
     def calculate_similarity(self, sentence):
@@ -189,7 +189,7 @@ class FeatureGen:
 
         if denominator == 0:
             return 0
-        
+
         score = numerator / denominator
 
         return score
@@ -223,7 +223,7 @@ class FeatureGen:
         # Template code so program compiles
         sentence1_string = ' '.join(sentence1)
         sentence2_string = ' '.join(sentence2)
-        
+
         sentence1_friends = set(self.shared_friends_dict[sentence1_string])
         sentence2_friends = set(self.shared_friends_dict[sentence2_string])
 
@@ -234,7 +234,7 @@ class FeatureGen:
             return 0
         score = numerator / denominator
 
-        return score 
+        return score
 
     def calculate_friends_score(self, sentence):
         """
@@ -250,7 +250,7 @@ class FeatureGen:
             if individual_sentence == sentence or individual_sentence[0] == '@':
                 continue
             score += self.friends_sentences(sentence, individual_sentence)
-        
+
         return score
 
     def sentence_centrality(self):
@@ -266,7 +266,7 @@ class FeatureGen:
             similarity_score = self.calculate_similarity(sentence)
             shared_grams_score = self.calculate_shared_gram_score(sentence)
             shared_friends_score = self.calculate_friends_score(sentence)
-            #print(similarity_score, shared_grams_score, shared_friends_score)
+            # print(similarity_score, shared_grams_score, shared_friends_score)
             score = (similarity_score + shared_grams_score + shared_friends_score) / (n - 1)
             feature_val_list.append(score)
 
@@ -274,7 +274,7 @@ class FeatureGen:
 
     def get_freq_term_summary(self):
 
-        freq_terms = set()  
+        freq_terms = set()
         for term in self.sentence_frequency_dict.keys():
             if self.sentence_frequency_dict[term] >= math.floor(self.min_th * self.summary_length) and self.sentence_frequency_dict[term] <= math.floor(self.max_th * self.summary_length) and term != 'length':
                 freq_terms.add(term)
@@ -326,7 +326,7 @@ class FeatureGen:
             similarity_score = self.calculate_similarity_sentences(sentence, individual_sentence)
             if similarity_score >= similarity_threshold:
                 self.shared_friends_dict[sentence_string].append(' '.join(individual_sentence))
-    
+
     def getfeaturevec(self, doc=None, setngrams=None):
         if doc is not "":
             self.text = doc
@@ -340,7 +340,7 @@ class FeatureGen:
         self.sentence_frequency()
         for sentence in self.text:
             self.generate_friends(sentence, self.sim_th)
-            
+
         self.feature_vector_list.append(self.sentence_centrality())
 
         self.feature_vector_list.append(self.word_sentence_score())

@@ -56,7 +56,8 @@ def pso_test(doc_dir: str, ref_dir: str, weights: List[float], config):
         doc, ref = Utils.load_document(doc_dir + "/" + d, ref_dir + "/" + r)
         doc_wo_title = Utils.remove_headings(doc)
         p_doc: List[List[str]] = Utils.process_document(doc, config.use_stopwords, config.use_lemmatizer)
-        p_doc_wo_title: List[List[str]] = Utils.process_document(doc_wo_title, config.use_stopwords, config.use_lemmatizer)
+        p_doc_wo_title: List[List[str]] = Utils.process_document(doc_wo_title, config.use_stopwords,
+                                                                 config.use_lemmatizer)
         p_ref: str = Utils.join_sentences(Utils.process_document(ref, config.use_stopwords, config.use_lemmatizer))
         features.append(PSO.extract_features(p_doc, config))
         documents.append(p_doc_wo_title)
@@ -74,5 +75,8 @@ def pso_test(doc_dir: str, ref_dir: str, weights: List[float], config):
         test_summaries.append(Utils.generate_summary([docs_wo_title[i][idx] for idx in p_sum_idx]))
         rouge_scores[i] = Utils.calculate_rouge(p_sum, [references[i]], 1)
 
+    print(sum(rouge_scores))
     print(rouge_scores)
     return test_summaries
+
+# Utils.content_overlap_metric()

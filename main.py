@@ -25,8 +25,8 @@ def parse_arguments(args):
     arg_parser.add_argument('-freq_thresh', '--freq_thresh', type=float, default=0.5)
     arg_parser.add_argument('-max_sent_thresh', '--max_sent_thresh', type=float, default=1.0)
     arg_parser.add_argument('-min_sent_thresh', '--min_sent_thresh', type=float, default=0.5)
-    arg_parser.add_argument('-use_stopwords', '--use_stopwords', type=bool, default=True)
-    arg_parser.add_argument('-use_stemmer', '--use_lemmatizer', type=bool, default=True)
+    arg_parser.add_argument('-use_stopwords', '--use_stopwords', type=str, default="True")
+    arg_parser.add_argument('-use_stemmer', '--use_lemmatizer', type=str, default="True")
     arg_parser.add_argument('-file', '--file', type=str, help="Model to be loaded", default=None)
     arg_parser.add_argument('-index', '--index', type=int)
 
@@ -55,9 +55,9 @@ elif config.mode == "test":
     w = [float(v) for v in f.readline().split(",")]
     f.close()
     test_summaries = pso_test("test/documents", "test/references", w, config)
-    i = 1
-    for sum in test_summaries:
-        outfile = open('PSO_sum_'+str(i)+".txt",'w', encoding='utf-8')
-        i+=1
-        outfile.write(sum)
-        outfile.close()
+    # i = 1
+    # for sum in test_summaries:
+    #     outfile = open('PSO_sum_'+str(i)+".txt",'w', encoding='utf-8')
+    #     i+=1
+    #     outfile.write(sum)
+    #     outfile.close()
